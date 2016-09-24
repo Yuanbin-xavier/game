@@ -1,0 +1,265 @@
+
+var hhp; var hatt; var hdef;
+
+var mhp; var matt; var mdef; var mgold; var mex; var mhead;
+
+var zidong=true; var delaytime;  var bgm;
+
+var shunXv=["heroAttack(turnTime)","heal(turnTime)"]; var shunXvi;
+var shunXvStr='["heroAttack(turnTime)","heal(turnTime)"]';
+var shunXvName=['攻击','治疗'];
+var turnTime=500;
+//======================================================英雄普攻
+function heroAttack(turnTime){
+    console.log(turnTime);
+    if(hatt-mdef>0) {
+        mhp = mhp - (hatt - mdef);
+    }
+    $("se").src="./audio/Sword1.ogg";
+    if(!showBattleInfo()) {
+        var i = 0;
+        while (i < $("heroAct_UI").children.length) {
+            $("heroAct_UI").children[i].setAttribute("disabled", "false");
+            i++;
+        }
+        setTimeout("monsterAttack()", turnTime);
+    }
+}
+//======================================================怪物普攻
+function monsterAttack(){
+    if(matt-hdef>0) {
+        hhp = hhp - (matt - hdef);
+    }
+    $("se").src="./audio/Attack2.ogg";
+    var i=0;
+    while(i<$("heroAct_UI").children.length){
+        $("heroAct_UI").children[i].removeAttribute("disabled");;
+        i++;
+    }
+    showBattleInfo();
+}
+//======================================================治疗
+function heal(turnTime){
+
+    hhp+=hdef;
+    $("se").src="./audio/Heal1.ogg";
+    if(!showBattleInfo()){
+        var i=0;
+        while(i<$("heroAct_UI").children.length){
+            $("heroAct_UI").children[i].setAttribute("disabled","false");
+            i++;
+        }
+        setTimeout("monsterAttack()",turnTime);
+    }
+}
+//======================================================
+function clearDiv(){
+    clear=ce();
+    clear.style="clear:both";
+    return clear;
+}
+//=======================================================显示战场
+function showBattlefield(){
+    hero.battleif=true;
+    if(!$("battlefield")){
+        battlefield=ce();
+        battlefield.id="battlefield";
+        battlefield.style="position:absolute; width:352px; height:352px; background:#eee; top:0px; left:0px;";
+        //============================英雄部分
+        {
+            heroUI = ce();
+            {
+                heroUI.id = "heroUI";
+                heroUI.style = "width:176px; heigth:352px; float:left";
+            }
+            heroHead_UI = ce();
+            {
+                heroHead_UI.id = "heroHead_UI";
+                heroHead_UI.style = "background:url(pic/mota2.png) " + (hero.sucaix * -32) + "px " + (hero.sucaiy * -32) + "px; width:32px; height:32px; ";
+            }
+            heroAct_UI=document.createElement("div");
+            {
+                heroAct_UI.id="heroAct_UI";
+                //heroAct_UI.style="float:left;";
+                heroAttack_UI = document.createElement("input");
+                {
+                    heroAttack_UI.id = "heroAttack_UI";
+                    heroAttack_UI.type = "button";
+                    heroAttack_UI.value = "攻击";
+                    heroAttack_UI.setAttribute('onclick','heroAttack(turnTime)');
+                }
+                heroHeal_UI=document.createElement("button");
+                {
+                    heroHeal_UI.id = "heroHeal_UI";
+                    //heroHeal_UI.type = "button";
+                    heroHeal_UI.innerHTML = "治疗";
+                    heroHeal_UI.setAttribute('onclick','heal(turnTime)');
+                }
+                heroAct_UI.appendChild(heroHeal_UI);
+                heroAct_UI.appendChild(heroAttack_UI);
+            }
+            heroInfo_UI = ce();
+            {
+                heroInfo_UI.id = "heroInfo_UI";
+                heroInfo_UI.style = "";
+                heroInfo_UI.innerHTML = "HP:" + hhp + "<br/>ATT:" + hatt + "<br/>DEF:" + hdef + "<br/>";
+            }
+
+            heroUI.appendChild(heroHead_UI);
+            heroUI.appendChild(heroAct_UI);
+            heroUI.appendChild(heroInfo_UI);
+        }
+        //===========================怪物部分
+        {
+            monster1UI = ce();
+            monster1UI.id = "monster1UI";
+            monster1UI.style = "width:176px; heigth:352px; float:right;text-align:right;";
+            monster1Head_UI = ce();
+            {
+                monster1Head_UI.id = "monster1Head_UI";
+                var ix=(mhead-1)%11;
+                var iy=parseInt((mhead-1)/11);
+                monster1Head_UI.style.backgroundPosition = (-32 * ix) + "px " + (-32 * iy) + "px";
+            }
+            monster1Info_UI = ce();
+            {
+                monster1Info_UI.id = "monster1Info_UI";
+                monster1Info_UI.style = "";
+                monster1Info_UI.innerHTML = "HP:"+mhp+"<br/>ATT:"+matt+"<br/>DEF:"+mdef+"<br/>GOLD:"+mgold+"<br/>EX:"+mex;
+            }
+            monster1UI.appendChild(monster1Head_UI);
+            monster1UI.appendChild(clearDiv());
+            monster1UI.appendChild(monster1Info_UI);
+            clear1=ce();
+            clear2=ce();
+
+        }
+
+        battlefield.appendChild(heroUI);
+        battlefield.appendChild(monster1UI);
+        $("mapCenter").appendChild(battlefield);
+    }else{
+        $("battlefield").hidden=false;
+        showBattleInfo();
+    }
+}
+//======================================================显示战斗数据==================================================
+function showBattleInfo(){
+    var ix=(mhead-1)%11;
+    var iy=parseInt((mhead-1)/11);
+    monster1Head_UI.style.backgroundPosition = (-32 * ix) + "px " + (-32 * iy) + "px";
+    $("heroInfo_UI").innerHTML="HP:"+hhp+"<br/>ATT:"+hatt+"<br/>DEF:"+hdef+"<br/>";
+    $("monster1Info_UI").innerHTML="HP:"+mhp+"<br/>ATT:"+matt+"<br/>DEF:"+mdef+"<br/>GOLD:"+mgold+"<br/>EX:"+mex;
+    return endBattle();
+}
+//================================================================战斗结束====================================
+function endBattle(){
+
+    if(hhp<0){
+        alert("GAME OVER");
+        shunXvi=0;
+        return true;
+    }else if(mhp<=0){
+        hero.hp=hhp;
+        hero.gold+=mgold;
+        hero.ex+=mex;
+        $("battlefield").hidden=true;
+        hero.battleif=false;
+        mapPointChange(hero.target.x,hero.target.y,'e');
+        shunXvi=0;
+
+        showmap();
+        showHeroInfo();
+        return true;
+    }
+    return false;
+}
+//=====================================================自动手动切换
+function zidongzhanxiehuan(){
+    console.log($('zidongzhan').innerText);
+    shunXvi=0;
+    if(zidong)
+        $('zidongzhan').innerText='自动战';
+    else
+        $('zidongzhan').innerText='手动战斗';
+    zidong=!zidong;
+}
+//========================================自动战====================================
+function zidongzhan(turnTime){
+    if(!hero.battleif || !zidong)
+        return;
+    else if(shunXv.length==0){
+        alert('未设置招式套路,请亲自指挥战斗');
+        return;
+    }
+    eval(shunXv[shunXvi]);
+    if(shunXvi<shunXv.length-1)
+    {shunXvi++;console.log("shunXvi++");}
+    else
+    {shunXvi=0;console.log("shunXvi=0");}
+
+    console.log(shunXvi);
+    setTimeout("zidongzhan(turnTime)",turnTime*2);
+}
+//================================技能释放顺序
+shunXvDiv=document.createElement('div');
+shunXvDiv.style="float:left; width:300px; ";
+
+shunXvmDiv=document.createElement('div');
+
+btn1=document.createElement('button');
+btn1.type='button';
+btn1.value='heroAttack(turnTime)';
+btn1.innerText='攻击';
+//btn1.onclick=editShunXv;
+btn1.setAttribute('onclick',"editShunXv(this)");
+
+btn2=document.createElement('button');
+btn2.type='button';
+btn2.value='heal(turnTime)';
+btn2.innerText='治疗';
+btn2.setAttribute('onclick',"editShunXv(this)");
+
+btnClear=document.createElement('button');
+btnClear.type='button';
+btnClear.value='clean';
+btnClear.innerText='清空';
+btnClear.setAttribute('onclick',"editShunXv(this)");
+
+
+shunXvDiv.appendChild(btn1);
+shunXvDiv.appendChild(btn2);
+shunXvDiv.appendChild(btnClear);
+shunXvDiv.appendChild(shunXvmDiv);
+var battleInit=function(){
+    $('box').appendChild(shunXvDiv);
+    shunXvmShow();
+}
+
+
+function editShunXv(btn){
+    if(btn.value=='clean')
+    {
+        shunXvStr='[]';
+        shunXv=eval(shunXvStr);
+        shunXvName=[];
+        shunXvmShow();
+        return;
+    }
+    var zhengze=/^(.*")]$/;
+    shunXvStr=shunXvStr.replace(zhengze,'$1,');
+    var zhengze=/^(.*)]$/;
+    shunXvStr=shunXvStr.replace(zhengze,'$1');
+    shunXvStr+="\""+btn.value+"\"]";
+    shunXv=eval(shunXvStr);
+
+    shunXvName.push(btn.innerText);
+    shunXvmShow();
+}
+
+function shunXvmShow(){
+    shunXvmDiv.innerHTML="";
+    for(i=0;i<shunXvName.length;i++){
+        shunXvmDiv.innerHTML+="<div style='text-align: center; background: #ccc;'>"+shunXvName[i]+"</div>"
+    }
+}

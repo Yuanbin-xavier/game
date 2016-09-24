@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>HTML5 Document</title>
+<style>
+  .gray {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    filter: grayscale(100%);
+    filter: gray;
+  }
+</style>
+<script>
+
+    function newSkill(x,y){
+      var skill=document.createElement('div');
+      skill.style.width="50px";
+      skill.style.height="50px";
+      skill.style.position="absolute";
+      skill.style.left=x*100+"px";
+      skill.style.top=y*100+"px";
+      //skill.style.border_style="solid";
+      //skill.style.border_color="#ccc";
+      skill.style.border="3px solid #555";
+      skill.style.borderColor="#ffff00";
+      skill.style.backgroundColor='#452';
+      return skill;
+    }
+    window.onload=function(){
+      var oDiv = document.createElement('div');
+      oDiv.style.width="800px";
+      oDiv.style.height="1800px";
+      oDiv.style.margin="auto";
+      oDiv.style.position="relative";
+      //oDiv.style.left="123px";
+      //oDiv.style.top="32px";
+      oDiv.style.backgroundColor='#800';
+      document.body.appendChild(oDiv);
+
+      var qoDiv = document.createElement('div');
+      qoDiv.style.width="10px";
+      qoDiv.style.height="20px";
+      qoDiv.style.backgroundColor='#49c';
+      oDiv.appendChild(qoDiv);
+
+      var qoDiv1 = document.createElement('div');
+      qoDiv1.style.width="50px";
+      qoDiv1.style.height="50px";
+      qoDiv1.style.backgroundColor='#751';
+      oDiv.appendChild(qoDiv1);
+
+      oDiv.appendChild(newSkill(1,1));
+      oDiv.appendChild(newSkill(4,4));
+      oDiv.appendChild(newSkill(4,5));
+
+      var button1=document.createElement('div');
+      button1.style="width:100px;height:30px;background-color:#123;position:absolute; top:10px";
+        button1.onclick = function() {
+            oDiv.hidden = !oDiv.hidden;
+        }
+        document.body.appendChild(button1);
+    }
+</script>
+</head>
+
+<body>
+<img src="ck.png" class="gray">
+</body>
+</html>

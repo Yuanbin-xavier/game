@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map</title>
+<style>
+  * {
+    font-family:'微软雅黑';
+  }
+  #monster1UI div {
+    float: right;
+  }
+  .clear  {
+    clear: both;
+  }
+</style>
+<script>
+  function $(Nid) {
+    return document.getElementById(Nid);
+  }
+</script>
+<script type="text/javascript" src="mapPosition.js"></script>
+<script type="text/javascript" src="mapData.js"></script>
+<script type="text/javascript" src="monsterData.js"></script>
+<script type="text/javascript" src="battle"></script>
+<script type="text/javascript" src="hero.js"></script>
+<script type="text/javascript" src="shop.js"></script>
+<script>
+
+  /*var map1=[
+    ["wall","wall","empty"],
+    ["thief","wall","empty"]
+  ]*/
+  var mapNow=new Array();//当前地图
+  var mapNowId=new Array();
+  var mapNowLou;//当前层数
+  //==============================创建地图(游戏开始)=============================================
+  /*function newmap(i){
+    //$("newmap").hidden=true;
+    //i=parseInt(i);
+    //var map=map[i];
+    mapNowLou=i;
+    m=ce();
+    m.id="mapCenter";
+    m.style="background:url(pic/background.png);/!*margin:auto;*!/ float:left; position:relative";
+    $("box").appendChild(m);
+    var x=0;
+    var y=0;
+    while(y<map[i].length){
+      x=0;
+      mapNow[y]=new Array();
+      while(x<map[i][y].length){
+        mapNow[y][x]=map[i][y][x];
+        var point=ce();
+        ix=eval(map[i][y][x])[0];
+        iy=eval(map[i][y][x])[1];
+        point.style.float="left";
+        point.style.backgroundPosition=(-32*ix)+"px "+(-32*iy)+"px";
+        point.id="map"+x+"p"+y;
+        m.appendChild(point);
+        x++;
+      }
+      var clean=ce();
+      clean.style="clear: both;";
+      m.appendChild(clean);
+      y++;
+    }
+    showmap();
+    showHeroInfo();
+  }*/
+
+  function newmap(i) {
+    mapNowLou = i;
+    m = ce();
+    m.id = "mapCenter";
+    m.style = "background:url(pic/background.png); /*margin:auto;*/ float:left; position:relative";
+    $("box").appendChild(m);
+    var x = 0;
+    var y = 0;
+    while ( y < map[i].length) {
+      x = 0;
+      mapNow[y] = new Array();
+      mapNowId[y] = new Array();
+      while ( x < map[i][y].length) {
+      mapNow[y][x] = arrId[map[i][y][x]];
+      mapNowId[y][x] = map[i][y][x];
+      var point = ce();
+      ix = (map[i][y][x]-1)%11;
+      iy = parseInt((map[i][y][x]-1)/11);
+      point.style.float = "left";
+      point.style.backgroundPosition = (-32*ix) + "px" + (-32 * iy) + "px";
+      point.id = "map" + x + "p" +y;
+      m.appendChild(point);
+      x++;
+    }
+      var clean = ce();
+      clean.style ="clear: both;";
+      m.appendChild(clean);
+      y++;
+    }
+    showmap();
+    showHeroInfo();
+  }
+
+  function ce(){
+    div = document.createElement("div");
+    div.style = "background:url(pic/mota2.png); width:32px; height:32px";
+    //div.style.width="32px";
+    //div.style.height="32px";
+    return div;
+  }
+
+//===================================显示刷新地图======================================
+  function showmap(){
+    y = 0;
+    while(y < mapNowId.length) {
+      x = 0;
+      while(x < mapNowId[y].length) {
+        point = $("map" + x + "p" + y);
+        ix = (mapNowId[y][x] - 1) % 11;
+        iy = parseInt((mapNowId[y][x] - 1)/11);
+        point.style.float = "left";
+        point.style.backgroundPosition = (-32 * ix) + "px" + (-32 * iy) + "px";
+        point.innerHTML = "";
+        if (hero.x == x && hero.y == y ) {
+          point.innerHTML = "<div style='background:url(pic/mota2.png)" + (-32 * hero.sucaix) + "px" + (-32 * hero.sucaiy) + "px" + "width:32px; height:32px;'></div>"
+        }
+        //point.id="map"+x+"p"+y;
+        //document.body.appendChild(point);
+        x++;
+      }
+      //var clean=ce();
+      //clean.style="clear: both;";
+      //document.body.appendChild(clean);
+      y++;
+    }
+  }
+//===================================换地图====================================
+  function mapChange(i) {
+    //============保存地图
+    var x = 0;
+    var y = 0;
+    while(y < mapNowId.length) {
+      x = 0;
+      while(x < mapNowId[y].length) {
+        map[mapNowLou][y][x] = mapNowId[y][x];
+        x++;
+      }
+      y++;
+    }
+
+    //====================载入新地图
+    mapNow = new Array();
+    mapNowLou = i;
+    var x = 0;
+    var y = 0;
+    while(y < map[i].length) {
+      x = 0;
+      mapNow[y] = new Array();
+      while(x < map[i][y].length){
+        mapNow[y][x] = arrId[map[i][y][x]];
+        mapNowId[y][x] = map[i][y][x];
+        point = $("map" + x + "p" + y);
+        ix = (map[i][y][x] - 1)%11;
+        iy = parseInt((map[i][y][x] - 1)/11);
+        point.style.backgroundPosition = (-32 * ix) + "px" + (-32 * iy) + "px";
+        x++;
+      }
+      y++;
+    }
+    showmap();
+  }
+  //===================================修改地图点=================================
+  function mapPointChange(x,y,point) {
+    for( var i in arrId){
+      if(arrId[i] === point){
+        mapNowId[y][x] = i;
+        mapNow[y][x] = arrId[i];
+      }
+    }
+  }
+  //================================小图ID,NAME,下标转换====================
+
+//======================================键盘事件====================================
+  document.onkeydown = function(evt) {
+    switch(evt.keyCode) {
+      case 38:
+        heroWalk('w');
+        break;
+      case 39:
+        heroWalk('d');
+        break;
+      case 40:
+        heroWalk('s');
+        break;
+      case 37:
+        heroWalk('a');
+        break;
+    }
+  }
+
+window.onload = function (){
+  newmap(1);
+  battleInit();
+}
+</script>
+</head>
+
+<body>
+<div id="box" style="width:1000px; margin:auto;">
+  <div id="left" style="float:left; width:200px;">
+    <div id="newmap" onclick="newmap(1)">newmap</div>
+    <div id="heroxy" onclick="cl()"></div>
+    <div id="heroinfo"></div>
+    <div id="mapinfo"></div>
+    <button type="button" id="zidongzhan" onclick="zidongzhanxiehuan()">手动战斗</button>
+    <!--<div id="2" onclick="mapChange(2)">2楼</div>
+    <div id="1" onclick="mapChange(1)">1楼</div>-->
+  </div>
+</div>
+<audio id="se" src="" controls="controls" loop="loop" autoplay="autoplay" hidden="true">亲 您的浏览器不支持html5的audio标签</audio>
+<script>$("se").loop=false;</script>
+</body>
+</html>

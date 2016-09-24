@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>HTML5 Document</title>
+<style>
+  .biankuang div {
+    border-left: 1px white solid;
+    border-top: 1px white solid;
+  }
+  .nobiankuang div {
+  }
+  .whiteBorder {
+    border: solid 1px white;
+  }
+  .blackBorder {
+    border: solid 1px black;
+  }
+</style>
+<script src="mapData.js"></script>
+<script src="mapPoint.js"></script>
+<script>
+  var unitNow;
+  var idNow = 1;
+  var idOld = idNow;
+
+  function ce() {
+    div = document.createElement("div");
+    return div;
+  }
+
+  function $(nid) {
+    return document.getElementById(nid);
+  }
+//=========================================================素材
+  function sucai() {
+    leftbox = ce();
+    leftbox.style.float = "left";
+    $('box').appendChild(leftbox);
+    y = 0;
+    i = 1;
+    while(y < 20) {
+      x = 0;
+      while(x < 11) {
+        div = ce();
+        div.style = "background:url(../pic/mota2.png) " + (-32*x) + "px" + (-32*y)+"px; width:32px; height:32px; float:left; ";
+        div.id = i;
+        div.setAttribute("class","blackborder");
+        div.onclick = a;
+
+        leftbox.appendChild(div);
+        x++;
+        i++;
+      }
+      clear = ce();
+      clear.style.clear = "both";
+      leftbox.appendChild(clear);
+      y++;
+    }
+  }
+//========================================================编辑框
+  function edit() {
+    editpic = ce();
+    editpic.id = "edit";
+    editpic.style = "float:left; width:300px; height:400px;"
+    $('box').appendChild(editpic);
+
+    editp = ce();
+    editp.id = "editp";
+    editp.style = "background:url(../pic/mota2.png) ;width:32px; height:32px; margin:auto;";
+    editpic.appendChild(editp);
+
+    editpic.innerHTML += '&nbsp ID:<input id="id" type="text"><br>' +
+        '&nbsp NAME:<input id="name" type="text"><br>' +
+        '&nbsp <input type="button" value="确定" onclick="putin()">';
+  }
+
+  function editmap() {
+    newmap = ce();
+    newmap.id = "newmap";
+    newmap.style.float = "left";
+    $('box').appendChild(newmap);
+    y = 0;
+    while(y < 11) {
+      x = 0;
+      while(x < 11) {
+        div = ce();
+        div.style = "background:url(../pic/mota2.png) 160px 0px; width:32px; height:32px; float:left; ";
+        div.setAttribute('data-mapid',6);
+        //div.onclick=b;
+        div.onmousedown = b;
+        div.ondragover = b;
+
+        newmap.appendChild(div);
+        x++;
+      }
+      clear = ce();
+      clear.styler = "clear:both; border-left:0px; border-top:0px;";
+      newmap.appendChild(clear);
+      y++;
+    }
+  }
+//获取unitNow坐标
+  function a() {
+    idNow = parseInt(this.id);
+    changeEdit();
+    //alert(this.style.backgroundPosition);
+  }
+//将坐标给unitNow;
+  function b() {
+    this.setAttribute('data-mapid',idNow);
+    this.style.backgroundPosition=unitNow;
+  }
+
+  function changeEdit() {
+    $(idOld).setAttribute("class","blackBorder");
+    unitNow = $(idNow).style.backgroundPosition;
+    $("editp").style.backgroundPosition=unitNow;
+    $(idNow).setAttribute("class","whiteBorder");
+    idOld = idNow;
+    if(arrId[idNow]) {
+      $("id").value = arrId[idNow];
+      $("name").value = arrName[idNow];
+    } else {
+      $("id").value = "";
+      $("name").value ="";
+    }
+  }
+//============================================================================地图边框线
+  function biankuang() {
+    newmap = $("newmap");
+    if (newmap.getAttribute("class") == "biankuang")
+      newmap.setAttribute("class","nobiankuang");
+    else {
+      newmap.setAttribute("class","biankuang");
+      //newmap.class="biankuang";
+    }
+  }
+//=========================================================================将数据放入内存
+  function putin() {
+    arrId[idNow] = $("id").value;
+    arrName[idNow] = $("name").value;
+    /*var id=$("id").value;
+    var name1=$("name").value;
+    arrsucai[id]=name1;
+    mappoint[id]=unitNow.match(/\d+/g);*/
+    //id.name=name1;
+  }
+  //=======================================================================显示数据
+  function putout() {
+    var str = "var arrId=new Array(); <br> var arrName=new Array(); <br>";
+    var strname = ""
+    for(var i in arrId) {
+      str += "arrId["+i+"]=\""+arrId[i]+"\";";
+      strname += "arrName["+i+"]=\""+arrName[i]+"\"; ";
+    }
+    str += "<br>"+strname;
+    console.log(str);
+    $("putout1").innerHTML = str;
+  }
+
+  function mapputout() {
+    var i = 0;
+    var y = 0;
+    var data = [];
+    data[y] = [];
+    var datastr = "["
+    while($('newmap').childNodes[i]) {
+      if($('newmap').childNodes[i].getAttribute('data-mapid') != null) {
+        data[y].push($('newmap').childNodes[i].getAttribute('data-mapid'));
+      } else {
+        datastr += "["+data[y]+"],";
+        data[++y] = [];
+      }
+      i++;
+    }
+    datastr = datastr.replace(/^(.*),$/,"$1")
+    datastr += '];';
+    data.pop();
+    $('putout2').innerHTML = datastr;
+    alert(data);
+    console.log(data);
+  }
+//=========================================================键盘事件
+  document.onkeydown = function(e) {
+    if(e.keyCode == 87 && e.shiftKey) {
+      idNow -= 11;
+      idNow += idNow < 0 ? 220 : 0;
+      changeEdit();
+    } else if (e.keyCode == 65 && e.shiftKey) {
+      idNow -= 1;
+      idNow += idNow < 0 ? 220 : 0;
+      changeEdit();
+    } else if (e.keyCode == 83 && e.shiftKey) {
+      idNow += 11;
+      idNow %= 220;
+      changeEdit();
+    } else if (e.keyCode == 68 && e.shiftKey) {
+      idNow += 1;
+      idNow %= 220;
+      changeEdit();
+    }
+  }
+
+  window.onload = function() {
+    sucai();
+    edit();
+    editmap();
+    $("1").onclick();
+    var i = 1;
+    while(i < 221){
+      $(i++).setAttribute("class","blackBorder");
+    }
+  }
+
+  //================================================================显示地图===============================
+  function newmap1(i) {
+    console.log(i);
+    if ($('mapLook')) {
+      m = $('mapLook');
+      m.innerHTML = "";
+    } else {
+      m = ce();
+      m.id = "mapLook";
+      m.style = "/*margin:auto;*/ float:left; position:relative";
+      document.body.appendChild(m);
+      console.log(map[i].length);
+
+      var btnzairu = document.createElement('button');
+      btnzairu.type = "button";
+      btnzairu.onclick = function() {
+        for (i = 0; i < $('newmap').childNodes.length; i++) {
+          $('newmap').childNodes[i].style.backgroundPosition = $('mapLook').childNodes[i].style.backgroundPosition;
+          $('newmap').childNodes[i].setAttribute('data-mapid',$('newmap').childNodes[i].getAttribute('data-mapid'));
+        }
+      };
+      btnzairu.innerHTML = "载入";
+      document.body.appendChild(btnzairu);
+    }
+    var x = 0;
+    var y = 0;
+    while (y < map[i].length) {
+      x = 0;
+      while (x < map[i][y].length) {
+        var point = ce();
+        ix = (map[i][y][x] - 1)%11;
+        iy = parseInt((map[i][y][x] - 1)/11);
+        point.setAttribute('data-mapid',map[i][y][x]);
+        point.style = "background:url(../pic/mota2.png); width:32px; height:32px";
+        point.style.float = "left";
+        point.style.backgroundPosition = (-32*ix)+ "px" + (-32*iy) + "px";
+        point.id = "map" + x + "p" + y;
+        m.appendChild(point);
+        x++;
+      }
+      var clean = ce();
+      clean.style = "clear: both;";
+      m.appendChild(clean);
+      y++;
+    }
+     //document.body.innerHTML+="<button type='button' onclick='zairu()'>载入</button>";
+    //showmap();
+  }
+</script>
+</head>
+
+<body>
+  <div onclick="biankuang()">边框线</div>
+  <div id="box" style="height:700px;"></div>
+
+  <input type="button" value="输出" onclick="putout()">
+  <input type="button" value="地图输出" onclick="mapputout()">
+  <div id="putout1"></div>
+  <div id="putout2"></div>
+  <input type="text" id="displaymapid">
+  <button type="button" onclick="newmap1($('displaymapid').value)">显示地图</button>
+</body>
+</html>
