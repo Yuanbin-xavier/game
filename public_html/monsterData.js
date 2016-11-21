@@ -1,6 +1,6 @@
 /*
-mSg.hp=50;	mSg.att=20;	mSg.def=1; mSg.gold=5; mSg.ex=5;
-mSr.hp=70;	mSr.att=15;	mSr.def=2; mSr.gold=6; mSr.ex=6;
+mSg.hp=50;  mSg.att=20; mSg.def=1; mSg.gold=5; mSg.ex=5;
+mSr.hp=70;  mSr.att=15; mSr.def=2; mSr.gold=6; mSr.ex=6;
 */
 function monster(hp,att,def,ex,gold) {
   this.hp = hp;
